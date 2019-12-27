@@ -6,12 +6,26 @@ import Vue from "vue";
 
 import Onorix, { mapReplicants, Replicant } from "..";
 
+const declaredReplicants = new Map();
+
 beforeAll(() => {
   Vue.config.productionTip = false;
 
   class TestReplicant<T> extends EventEmitter {
     status = "declaring";
-    value = undefined;
+    rawValue = undefined;
+
+    get value(): T {
+      return this.rawValue;
+    }
+
+    set value(value: T) {
+      this.rawValue = value;
+
+      setTimeout(() => {
+        this.emit("change", value);
+      });
+    }
 
     constructor(
       readonly name: string,
@@ -36,7 +50,7 @@ beforeAll(() => {
         }
 
         this._declare(opts.defaultValue);
-      }, 100);
+      });
     }
 
     _declare(value: T): void {
@@ -44,8 +58,6 @@ beforeAll(() => {
       this.emit("change", value);
     }
   }
-
-  const declaredReplicants = new Map();
 
   global["NodeCG"] = {
     async waitForReplicants(...replicants: ReplicantBrowser<unknown>[]): Promise<void> {
@@ -79,6 +91,10 @@ beforeAll(() => {
   };
 
   Vue.use(Onorix);
+});
+
+beforeEach(() => {
+  declaredReplicants.clear();
 });
 
 describe("onorix", () => {

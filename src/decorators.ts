@@ -4,8 +4,7 @@ import { mapReplicants, ReplicantDescriptor } from ".";
 
 /**
  * Decorator for declaring a replicant as computed property.
- * @param name the replicant name
- * @param options the replicant options
+ * @param descriptor the replicant descriptor
  */
 export function Replicant<V>(descriptor: ReplicantDescriptor<V> = {}): VueDecorator {
   return createDecorator((componentOptions, key): void => {

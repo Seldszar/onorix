@@ -17,9 +17,34 @@ export function Replicant<V>(descriptor: ReplicantDescriptor<V> = {}): VueDecora
       componentOptions.computed = {};
     }
 
+    if (componentOptions.watch == null) {
+      componentOptions.watch = {};
+    }
+
     Object.assign(componentOptions.computed, mapReplicants([key]));
     Object.assign(componentOptions.replicants, {
       [key]: descriptor,
+    });
+
+    const watch: unknown = componentOptions.watch;
+
+    if (watch[key] == null) {
+      watch[key] = [];
+    }
+
+    if (!Array.isArray(watch[key])) {
+      watch[key] = [watch[key]];
+    }
+
+    watch[key].push({
+      deep: true,
+      handler(this: Vue, newValue: V, oldValue: V): void {
+        if (newValue !== oldValue) {
+          return;
+        }
+
+        this[key] = newValue;
+      },
     });
   });
 }

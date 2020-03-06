@@ -175,7 +175,7 @@ describe("onorix", () => {
   it("should handle replicant updates", async () => {
     expect.assertions(1);
 
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       shallowMount(Vue, {
         render: h => h(),
         replicants: {
@@ -185,7 +185,12 @@ describe("onorix", () => {
         },
         created(this: Vue): void {
           this.$watch("$replicants.hi.value", newValue => {
-            expect(newValue).toBe("seldszar");
+            try {
+              expect(newValue).toBe("seldszar");
+            } catch (error) {
+              reject(error);
+            }
+
             resolve();
           });
 
@@ -198,7 +203,7 @@ describe("onorix", () => {
   it("should update replicant from computed", async () => {
     expect.assertions(1);
 
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       shallowMount(Vue, {
         render: h => h(),
         replicants: {
@@ -209,7 +214,12 @@ describe("onorix", () => {
         },
         created(this: Vue): void {
           this.$watch("hello", newValue => {
-            expect(newValue).toBe("spark");
+            try {
+              expect(newValue).toBe("spark");
+            } catch (error) {
+              reject(error);
+            }
+
             resolve();
           });
 

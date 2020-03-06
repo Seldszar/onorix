@@ -62,7 +62,11 @@ export default function install(Vue: VueConstructor<Vue>): void {
       await Promise.all(this.$children.map(o => o.$waitForReplicants(deep)));
     }
 
-    await NodeCG.waitForReplicants(...Object.values(this.$replicants));
+    const declaredReplicants = Object.values(this.$replicants);
+
+    if (declaredReplicants.length > 0) {
+      await NodeCG.waitForReplicants(...declaredReplicants);
+    }
   };
 
   Vue.mixin({

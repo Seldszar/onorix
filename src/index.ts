@@ -31,8 +31,9 @@ declare module "vue/types/vue" {
 
     /**
      * Awaits until declared replicants are ready.
+     * @param deep indicates if children must be included
      */
-    $waitForReplicants(): Promise<void>;
+    $waitForReplicants(deep?: boolean): Promise<void>;
   }
 }
 
@@ -56,8 +57,11 @@ export * from "./helpers";
  */
 export default function install(Vue: VueConstructor<Vue>): void {
   Vue.prototype.$nodecg = Vue.nodecg = wrapNodeCG(Vue, nodecg);
-  Vue.prototype.$waitForReplicants = async function(this: Vue): Promise<void> {
-    await Promise.all(this.$children.map(o => o.$waitForReplicants()));
+  Vue.prototype.$waitForReplicants = async function(this: Vue, deep = true): Promise<void> {
+    if (deep) {
+      await Promise.all(this.$children.map(o => o.$waitForReplicants(deep)));
+    }
+
     await NodeCG.waitForReplicants(...Object.values(this.$replicants));
   };
 

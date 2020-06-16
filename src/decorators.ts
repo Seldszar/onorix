@@ -1,3 +1,4 @@
+import { ReplicantOptions } from "nodecg/types/browser";
 import { VueDecorator, createDecorator } from "vue-class-component";
 
 import { mapReplicants, ReplicantDescriptor } from ".";
@@ -6,7 +7,26 @@ import { mapReplicants, ReplicantDescriptor } from ".";
  * Decorator for declaring a replicant as computed property.
  * @param descriptor the replicant descriptor
  */
-export function Replicant<V>(descriptor: ReplicantDescriptor<V> = {}): VueDecorator {
+export function Replicant<V>(name: string, options?: ReplicantOptions<V>): VueDecorator;
+export function Replicant<V>(
+  name: string,
+  namespace: string,
+  options?: ReplicantOptions<V>,
+): VueDecorator;
+export function Replicant<V>(descriptor?: ReplicantDescriptor<V>): VueDecorator;
+export function Replicant<V>(
+  name?: string | ReplicantDescriptor<V>,
+  namespace?: string | ReplicantOptions<V>,
+  options?: ReplicantOptions<V>,
+): VueDecorator {
+  if (typeof name === "object") {
+    return Replicant(name.name, name.namespace, name);
+  }
+
+  if (typeof namespace === "object") {
+    return Replicant(name, undefined, namespace);
+  }
+
   return createDecorator((componentOptions, key): void => {
     if (componentOptions.replicants == null) {
       componentOptions.replicants = {};
@@ -22,7 +42,7 @@ export function Replicant<V>(descriptor: ReplicantDescriptor<V> = {}): VueDecora
 
     Object.assign(componentOptions.computed, mapReplicants([key]));
     Object.assign(componentOptions.replicants, {
-      [key]: descriptor,
+      [key]: { ...options, name, namespace },
     });
 
     const watch: unknown = componentOptions.watch;

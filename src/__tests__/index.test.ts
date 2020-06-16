@@ -160,6 +160,7 @@ describe("onorix", () => {
     class App extends Vue {
       @Replicant() hello!: unknown;
       @Replicant({ name: "bye", defaultValue: "spark" }) cya!: unknown;
+      @Replicant("bip", { defaultValue: 1 }) boop!: unknown;
     }
 
     const { vm } = shallowMount(App, {
@@ -170,6 +171,7 @@ describe("onorix", () => {
     expect(vm.$options.computed.cya).toBeDefined();
     expect(vm).toHaveProperty("hello", undefined);
     expect(vm).toHaveProperty("cya", "spark");
+    expect(vm).toHaveProperty("boop", 1);
   });
 
   it("should handle replicant updates", async () => {

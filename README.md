@@ -1,6 +1,6 @@
 # Onorix
 
-> Yet another NodeCG plugin for Vue.
+> Yet another NodeCG plugin for Vue.js 3.x
 
 ## Table of Contents
 
@@ -12,76 +12,76 @@
 ## Installation
 
 ```bash
-npm install onorix
-```
-
-```javascript
-import Vue from "vue";
-import Onorix from "onorix";
-
-Vue.use(Onorix);
+npm install onorix@next
 ```
 
 ## Usage
 
-### Replicants
+### Replicant
 
-```javascript
-const app = new Vue({
-  replicants: {
-    /**
-     * Declares a `lorem` replicant.
-     */
-    lorem: {},
+You can define replicants in `setup()` by calling `replicant()`.
 
-    /**
-     * Declares a `dolor` replicant but accessible from `ipsum`.
-     */
-    ipsum: {
-      name: "dolor",
-    },
+```typescript
+import { replicant } from "onorix";
+import { defineComponent } from "vue";
 
-    /**
-     * Declares a `sit` replicant with the given options.
-     */
-    sit: {
-      defaultValue: "Spark",
-      persistent: false,
-    },
+const Component = defineComponent({
+  setup() {
+    const hello = replicant("hello", {
+      defaultValue: "Hello World",
+    });
 
-    /**
-     * Declares a `amet` replicant from the `acta` namespace.
-     */
-    amet: {
-      namespace: "acta",
-    },
-  },
-  created() {
-    console.log(this.$replicants.lorem);
+    return {
+      hello,
+    };
   },
 });
 ```
 
-### Decorators
+You can also call `replicantAsync()` in order to wait until the replicant is defined before mounting the component.
+This approach can be useful if you want to use `<Suspense />`.
 
-If prefer decorators, you can declare replicants with `@Replicant`.
-The main difference with the previous example is that a computed property is being defined as well.
+```typescript
+import { replicantAsync } from "onorix";
+import { defineComponent } from "vue";
 
-```javascript
-import { Replicant } from "onorix";
-import { Component, Vue } from "vue-property-decorators";
+const Component = defineComponent({
+  async setup() {
+    const hello = await replicantAsync("hello", {
+      defaultValue: "Hello World",
+    });
 
-@Component
-class App extends Vue {
-  @Replicant() lorem;
-  @Replicant({ name: "dolor" }) ipsum;
-  @Replicant({ defaultValue: "Spark", persistent: false }) sit;
-  @Replicant({ namespace: "acta" }) amet;
+    return {
+      hello,
+    };
+  },
+});
+```
 
-  created() {
-    console.log(this.$replicants.lorem.value === this.lorem);
-  }
-}
+If you want to retrieve a replicant value once, you can use `readReplicant()` and `readReplicantAsync()`.
+Their usage is the same as previously explained but the value will be readonly and not be updated.
+
+### Message Listener
+
+If you want to listen to messages from NodeCG, you can use `listenFor()` in `setup()`.
+
+```typescript
+import { listenFor } from "onorix";
+import { defineComponent, reactive } from "vue";
+
+const Component = defineComponent({
+  async setup() {
+    const list = reactive([]);
+
+    listenFor("newItem", (item) => {
+      list.push(item);
+    });
+
+    return {
+      list,
+    };
+  },
+});
 ```
 
 ## Author
